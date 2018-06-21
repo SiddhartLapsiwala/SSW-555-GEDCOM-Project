@@ -245,6 +245,7 @@ class Repository:
             #print("|".join(result))
 
     def validate_family_marriage_before_divorce(self):
+        """US04	Marriage before divorce"""
         result = False
         for key,family in self.family.items():
             if family.marriage > family.divorced:
@@ -253,6 +254,7 @@ class Repository:
         return result
 
     def validate_family_marriage_before_death(self):
+        """US05	Marriage before death"""
         result = False
         for key, family in self.family.items():
             if family.marriage > self.individual[list(family.husband_id)[0]].death:
@@ -281,21 +283,27 @@ def main():
 
 
 class Test(unittest.TestCase):
-    def test(self):
-        """Verify result"""
+    def test_validate_family_marriage_before_divorce(self):
+        """US04	Marriage before divorce"""
+        path = 'proj03test.ged'
+        repo = Repository()
+        repo.read_file(path)
+        self.assertEqual(repo.validate_family_marriage_before_divorce(), True)
+        self.assertNotEqual(repo.validate_family_marriage_before_divorce(), False)
+        self.assertTrue(repo.validate_family_marriage_before_divorce())
+        self.assertIsNotNone(repo.validate_family_marriage_before_divorce())
+        self.assertIsNot(repo.validate_family_marriage_before_divorce(), '')
+
+    def test_validate_family_marriage_before_death(self):
+        """US05	Marriage before death"""
         path = 'proj03test.ged'
         repo = Repository()
         repo.read_file(path)
         self.assertEqual(repo.validate_family_marriage_before_death(), True)
-        self.assertEqual(repo.validate_family_marriage_before_divorce(), True)
         self.assertNotEqual(repo.validate_family_marriage_before_death(), False)
-        self.assertNotEqual(repo.validate_family_marriage_before_divorce(), False)
         self.assertTrue(repo.validate_family_marriage_before_death())
-        self.assertTrue(repo.validate_family_marriage_before_divorce())
         self.assertIsNotNone(repo.validate_family_marriage_before_death())
-        self.assertIsNotNone(repo.validate_family_marriage_before_divorce())
         self.assertIsNot(repo.validate_family_marriage_before_death(), '')
-        self.assertIsNot(repo.validate_family_marriage_before_divorce(), '')
 
 
 if __name__ == '__main__':
