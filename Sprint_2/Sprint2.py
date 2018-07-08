@@ -469,9 +469,11 @@ class Repository:
         """US11 - Marriage should not occur during marriage to another spouse"""
         result = False
         for key, family in self.family.items():
-            if family.marriage is not "" and family.divorced < family.marriage:
+            wifeid = ",".join(family.wife_id)
+            husid = ",".join(family.husband_id)
+            if family.marriage < family.divorced:
                 print("Error: FAMILY: US11:", key, " Marriage should not occur during marriage to another spouse ")
-                result = True
+            result = True
         return result
 
     def validate_sibiling_spacing(self):
