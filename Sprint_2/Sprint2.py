@@ -466,7 +466,7 @@ class Repository:
         result = False
         for key, family in self.family.items():
             if family.marriage is not "" and family.divorced < family.marriage:
-                print("Error Marriage should not occur during marriage to another spouse " + key)
+                print("Error: FAMILY: US11:", key, " Marriage should not occur during marriage to another spouse ")
                 result = True
         return result
 
@@ -486,10 +486,12 @@ class Repository:
                     for each_month_element in range(len(sibmonth)-1):
                         month_diff = sibmonth[each_month_element+1]-sibmonth[each_month_element]
                         if month_diff > 8:
+                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
                             result = True
                     for each_day_element in range(len(sibday)-1):
                         day_diff = sibday[each_day_element+1]-sibday[each_day_element]
                         if day_diff < 2:
+                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
                             result = True
         return result
 
