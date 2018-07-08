@@ -16,6 +16,7 @@ import unittest
 from prettytable import PrettyTable
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 
 
 def file_reader(path):
@@ -42,6 +43,7 @@ def file_reader(path):
 
 class Individual:
     """Single Individual"""
+
     def __init__(self, id):
         self.id = id
         self.name = ''
@@ -89,11 +91,13 @@ class Individual:
             self.child = "NA"
         if len(self.spouse) == 0:
             self.spouse = "NA"
-        return [self.id, self.name, self.gender, self.birthday, self.age, self.alive, self.death, self.child, self.spouse]
+        return [self.id, self.name, self.gender, self.birthday, self.age, self.alive, self.death, self.child,
+                self.spouse]
 
 
 class Family:
     """Single Family"""
+
     def __init__(self, id):
         self.id = id
         self.marriage = 'NA'
@@ -133,7 +137,6 @@ class Family:
 
 
 class Repository:
-
     def __init__(self):
         """All information about Individual and Family"""
         self.individual = dict()
@@ -242,7 +245,7 @@ class Repository:
                 result.append(argument)
                 result.append("N")
                 result.append(tag)
-            # print("|".join(result))
+                # print("|".join(result))
 
     def validate_before_current_date_individual(self):
         """US01 - Date before current date Individual and Family: Birthday, Death, Marriage and Divorced Date"""
@@ -251,7 +254,8 @@ class Repository:
         for key, individual in self.individual.items():
             if individual.death != 'NA' or individual.death != 'NA':
                 if individual.birthday > today_date:
-                    print("Error: INDIVIDUAL : US01 : " + key + " : Birthday " + individual.birthday +" occurs in future")
+                    print(
+                        "Error: INDIVIDUAL : US01 : " + key + " : Birthday " + individual.birthday + " occurs in future")
                     result = True
                 if individual.death > today_date:
                     print("Error: INDIVIDUAL : US01 : " + key + " : Death " + individual.birthday + " occurs in future")
@@ -259,26 +263,25 @@ class Repository:
         for key, family in self.family.items():
             if family.marriage != 'NA' or family.divorced != 'NA':
                 if family.marriage > today_date:
-                    print(
-                        "Error: FAMILY : US01 : " + key + " : Marriage Date " + family.marriage + " occurs in future")
+                    print("Error: FAMILY : US01 : " + key + " : Marriage Date " + family.marriage + " occurs in future")
                     result = True
                 if family.divorced > today_date:
-                    print( "Error: FAMILY : US01 : " + key + " : Divorced Date " + family.divorced + " occurs in future")
-                    result =  True
+                    print("Error: FAMILY : US01 : " + key + " : Divorced Date " + family.divorced + " occurs in future")
+                    result = True
         return result
 
     def validate_birth_before_marriage(self):
         """US02 - TJ Birth before marriage of Individual"""
         result = False
         for key, family in self.family.items():
-            if family.marriage !="NA":
+            if family.marriage != "NA":
                 if family.marriage < self.individual[list(family.husband_id)[0]].birthday:
-                    print(
-                        "Error: FAMILY : US02 : " + key + " Birth " + self.individual[list(family.husband_id)[0]].birthday + " of husband should occur before marriage " + family.marriage)
+                    print("Error: FAMILY : US02 : " + key + " Birth " + self.individual[list(family.husband_id)[
+                        0]].birthday + " of husband should occur before marriage " + family.marriage)
                     result = True
                 if family.marriage < self.individual[list(family.wife_id)[0]].birthday:
-                    print(
-                        "Error: FAMILY : US02 : " + key + " Birth " + self.individual[list(family.wife_id)[0]].birthday + " of wife should occur before marriage " + family.marriage)
+                    print("Error: FAMILY : US02 : " + key + " Birth " + self.individual[list(family.wife_id)[
+                        0]].birthday + " of wife should occur before marriage " + family.marriage)
                     result = True
         return result
 
@@ -286,9 +289,10 @@ class Repository:
         """US03 - TJ Birth before Death of Individual"""
         result = False
         for key, individual in self.individual.items():
-            if individual.birthday != 'NA' or individual.death!='NA':
+            if individual.birthday != 'NA' or individual.death != 'NA':
                 if individual.birthday > individual.death:
-                    print("Error: Individual: US03: " + key + " Birth " + individual.birthday + "should occur before death " + individual.death)
+                    print(
+                        "Error: Individual: US03: " + key + " Birth " + individual.birthday + "should occur before death " + individual.death)
                     result = True
         return result
 
@@ -296,8 +300,9 @@ class Repository:
         """US04	Marriage before divorce"""
         result = False
         for key, family in self.family.items():
-            if family.marriage > family.divorced:
-                print("Error: FAMILY : US04 : " + key + " Marriage "+family.marriage+" should occur before divorce "+family.divorced)
+            if family.marriage < family.divorced:
+                print(
+                    "Error: FAMILY : US04 : " + key + " Marriage " + family.marriage + " should occur before divorce " + family.divorced)
                 result = True
         return result
 
@@ -306,10 +311,12 @@ class Repository:
         result = False
         for key, family in self.family.items():
             if family.marriage > self.individual[list(family.husband_id)[0]].death:
-                print("Error: FAMILY : US05 : " +key+ " Marriage " +family.marriage + " should occur before death " + self.individual[list(family.husband_id)[0]].death + " of either spouse")
+                print("Error: FAMILY : US05 : " + key + " Marriage " + family.marriage + " should occur before death " +
+                      self.individual[list(family.husband_id)[0]].death + " of either spouse")
                 result = True
             if family.marriage > self.individual[list(family.wife_id)[0]].death:
-                print("Error: FAMILY : US05 : " +key+ " Marriage " +family.marriage + " should occur before death "+ self.individual[list(family.wife_id)[0]].death+"of either spouse")
+                print("Error: FAMILY : US05 : " + key + " Marriage " + family.marriage + " should occur before death " +
+                      self.individual[list(family.wife_id)[0]].death + "of either spouse")
                 result = True
         return result
 
@@ -318,7 +325,8 @@ class Repository:
         result = False
         for key, family in self.family.items():
             if family.divorced > self.individual[list(family.husband_id)[0]].death:
-                print("Error: FAMILY : US06 : " +key + " Divorce "+family.divorced+" should occur before death " +self.individual[list(family.husband_id)[0]].death+" of either spouse")
+                print("Error: FAMILY : US06 : " + key + " Divorce " + family.divorced + " should occur before death " +
+                      self.individual[list(family.husband_id)[0]].death + " of either spouse")
                 result = True
             if family.divorced > self.individual[list(family.wife_id)[0]].death:
                 print("Error: FAMILY : US06 : " + key + " Divorce " + family.divorced + " should occur before death " +
@@ -332,10 +340,12 @@ class Repository:
         for key, individual in self.individual.items():
             if individual.age >= 150:
                 if individual.death == 'NA':
-                    print("Error: INDIVIDUAL : US07 : " +key+ " Individual should be less than 150 years after birth date " + individual.birthday )
+                    print(
+                        "Error: INDIVIDUAL : US07 : " + key + " Individual should be less than 150 years after birth date " + individual.birthday)
                     result = True
                 else:
-                    print("Error: INDIVIDUAL : US07 : " +key+ " Individual should be less than 150 years after birth date " + individual.birthday )
+                    print(
+                        "Error: INDIVIDUAL : US07 : " + key + " Individual should be less than 150 years after birth date " + individual.birthday)
                     result = True
         return result
 
@@ -345,7 +355,8 @@ class Repository:
             listofchildren = list(family.children)
             for child in listofchildren:
                 if family.marriage > self.individual[child].birthday:
-                    print("Error: FAMILY : US08 : " + key + " Children " + child + " should be born after marriage of parents ")
+                    print(
+                        "Error: FAMILY : US08 : " + key + " Children " + child + " should be born after marriage of parents ")
                     result = True
                 elif family.divorced != 'NA':
                     divorced = datetime.strptime(family.divorced, '%Y-%m-%d')
@@ -364,44 +375,11 @@ class Repository:
     def date_diff(self, date1, date2, limit, unit):
         """Function to check dates are in given range(limit)"""
         standardunit = {'days': 1, 'months': 30.4, 'year': 365.25}
-        return abs((date1-date2).days/standardunit[unit]) >= limit
+        return abs((date1 - date2).days / standardunit[unit]) >= limit
 
-    def validate_parents_not_too_old(self):
-        """US12 - Mother should be less than 60 years older than her children and father should be less than 80 years older than his children"""
-        for key, family in self.family.items():
-            listofchildren = list(family.children)
-            mother = list(family.wife_id)[0]
-            father = list(family.husband_id)[0]
-            for child in listofchildren:
-                if self.date_diff(self.convert_to_date(self.individual[mother].birthday),self.convert_to_date(self.individual[child].birthday),60,"year"):
-                        print("Error: FAMILY : US12 : " + key + " : Mother " + mother + " should not be less than 60 years older than her child " + child)
-                        result = True
-                if self.date_diff(self.convert_to_date(self.individual[father].birthday),self.convert_to_date(self.individual[child].birthday),80,"year"):
-                        print("Error: FAMILY : US12 : " +key + " : Father " + father +" should not be less than 80 years older than his child " + child)
-                        result = True
-        return result
-
-    def check_all_elements_equal(self,list):
+    def check_all_elements_equal(self, list):
         if list[1:] == list[:-1]:
             return True
-
-    def validate_male_last_names(self):
-        """US16 - All male members of a family should have the same last name"""
-        listofmalemember = dict()
-        for key, family in self.family.items():
-            listofchildren = list(family.children)
-            father = list(family.husband_id)[0]
-            listofmalemember[father] = self.individual[father].name.split("/")[1]
-            for child in listofchildren:
-                if self.individual[child].gender == "M":
-                    listofmalemember[child] = self.individual[child].name.split("/")[1]
-            if self.check_all_elements_equal(list(listofmalemember.values())):
-                result = False
-            else:
-                print(
-                    "Error: FAMILY : US16 : " + key + " All male members should have the same last name ")
-                result = True
-        return result
 
     def validate_childbirth_before_death_parents(self):
         """US09 - Birth before death of parents"""
@@ -439,6 +417,79 @@ class Repository:
                 result = True
         return result
 
+    def validate_no_bigamy(self):
+        """US11 - Marriage should not occur during marriage to another spouse"""
+        result = False
+        husband_in_multiple_family = defaultdict(list)
+        for key, family in self.family.items():
+            husid = ",".join(family.husband_id)
+            """I01:{F23,F24}"""
+            """I02:{F36,F37}"""
+            husband_in_multiple_family[husid].append(key)
+        for key, value in husband_in_multiple_family.items():
+            if len(value) >= 2:
+                divorce_date = self.family[value[0]].divorced
+                if divorce_date != 'NA':
+                    for id in range(1, len(value)):
+                        if divorce_date > self.family[value[id]].marriage:
+                            print("Error: FAMILY: US11:", value[id],
+                                  " : " + key + ": Marriage should not occur during marriage to another spouse ")
+                            result = True
+        return result
+
+    def validate_parents_not_too_old(self):
+        """US12 - Mother should be less than 60 years older than her children and father should be less than 80 years older than his children"""
+        for key, family in self.family.items():
+            listofchildren = list(family.children)
+            mother = list(family.wife_id)[0]
+            father = list(family.husband_id)[0]
+            for child in listofchildren:
+                if self.date_diff(self.convert_to_date(self.individual[mother].birthday),
+                                  self.convert_to_date(self.individual[child].birthday), 60, "year"):
+                    print(
+                        "Error: FAMILY : US12 : " + key + " : Mother " + mother + " should not be less than 60 years older than her child " + child)
+                    result = True
+                if self.date_diff(self.convert_to_date(self.individual[father].birthday),
+                                  self.convert_to_date(self.individual[child].birthday), 80, "year"):
+                    print(
+                        "Error: FAMILY : US12 : " + key + " : Father " + father + " should not be less than 80 years older than his child " + child)
+                    result = True
+        return result
+
+    def validate_sibiling_spacing(self):
+        """US13 - Birth Dates of Sibilings should be more than 8 months apart or less than 2 days apart"""
+        result = False
+        sibday = []
+        sibmonth = []
+        for key, family in self.family.items():
+            children_list = list(family.children)
+            if self.individual[list(family.children)[0]].id in family.children:
+                for each_sibiling in children_list:
+                    sib_birthday_month = datetime.today().strptime(self.individual[each_sibiling].birthday,
+                                                                   '%Y-%m-%d').month
+                    sib_birthday_day = datetime.today().strptime(self.individual[each_sibiling].birthday,
+                                                                 '%Y-%m-%d').day
+                    sibday.append(sib_birthday_day)
+                    sibmonth.append(sib_birthday_month)
+                    for each_month_element in range(len(sibmonth) - 1):
+                        month_diff = sibmonth[each_month_element + 1] - sibmonth[each_month_element]
+                        if month_diff > 8:
+                            result = True
+                        else:
+                            print(
+                                "Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart",
+                                key)
+
+                    for each_day_element in range(len(sibday) - 1):
+                        day_diff = sibday[each_day_element + 1] - sibday[each_day_element]
+                        if day_diff < 2:
+                            result = True
+                        else:
+                            print(
+                                "Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart",
+                                key)
+        return result
+
     def validate_multiple_births(self):
         """US14 - Multiple births <= 5"""
         result = False
@@ -452,57 +503,36 @@ class Repository:
             if max(list_birthdays) <= 5:
                 result = True
             else:
-                print("Error: FAMILY : US14: " + key + "Number of children born in a single birth should not be greater than 5")
+                print(
+                    "Error: FAMILY : US14: " + key + "Number of children born in a single birth should not be greater than 5")
         return result
 
     def validate_maximum_number_of_siblings(self):
         """US15 -Fewer than 15 siblings"""
         result = False
         for key, family in self.family.items():
-            if len(family.children) < 15:
+            if len(family.children) > 15:
+                print(
+                    "Error: FAMILY : US15: " + key + "Total Number of children born in the family should be less than 15")
                 result = True
+        return result
+
+    def validate_male_last_names(self):
+        """US16 - All male members of a family should have the same last name"""
+        listofmalemember = dict()
+        for key, family in self.family.items():
+            listofchildren = list(family.children)
+            father = list(family.husband_id)[0]
+            listofmalemember[father] = self.individual[father].name.split("/")[1]
+            for child in listofchildren:
+                if self.individual[child].gender == "M":
+                    listofmalemember[child] = self.individual[child].name.split("/")[1]
+            if self.check_all_elements_equal(list(listofmalemember.values())):
+                result = False
             else:
-                print("Error: FAMILY : US15: " + key + "Total umber of children born in the family should be less than 15")
-        return result
-
-    def validate_no_bigamy(self):
-        """US11 - Marriage should not occur during marriage to another spouse"""
-        result = False
-        for key, family in self.family.items():
-            wifeid = ",".join(family.wife_id)
-            husid = ",".join(family.husband_id)
-            if family.marriage < family.divorced:
-                print("Error: FAMILY: US11:", key, " Marriage should not occur during marriage to another spouse ")
-            result = True
-        return result
-
-    def validate_sibiling_spacing(self):
-        """US13 - Birth Dates of Sibilings should be more than 8 months apart or less than 2 days apart"""
-        result = False
-        sibday = []
-        sibmonth = []
-        for key, family in self.family.items():
-            children_list = list(family.children)
-            if self.individual[list(family.children)[0]].id in family.children:
-                for each_sibiling in children_list:
-                    sib_birthday_month = datetime.today().strptime(self.individual[each_sibiling].birthday, '%Y-%m-%d').month
-                    sib_birthday_day = datetime.today().strptime(self.individual[each_sibiling].birthday,  '%Y-%m-%d').day
-                    sibday.append(sib_birthday_day)
-                    sibmonth.append(sib_birthday_month)
-                    for each_month_element in range(len(sibmonth)-1):
-                        month_diff = sibmonth[each_month_element+1]-sibmonth[each_month_element]
-                        if month_diff > 8:
-                            result = True
-                        else:
-                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
-
-                    for each_day_element in range(len(sibday)-1):
-                        day_diff = sibday[each_day_element+1]-sibday[each_day_element]
-                        if day_diff < 2:
-                            result = True
-                        else:
-                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
-
+                print(
+                    "Error: FAMILY : US16 : " + key + " All male members should have the same last name ")
+                result = True
         return result
 
 
@@ -553,6 +583,7 @@ def main():
 
 class Test(unittest.TestCase):
     """US01"""
+
     def test_validate_before_current_date_individual(self):
         """US01 - Date before current date Individual and Family: Birthday, Death, Marriage and Divorced Date"""
         path = 'proj03test.ged'
@@ -565,6 +596,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_before_current_date_individual(), '')
 
     """US02"""
+
     def test_validate_birth_before_marriage(self):
         """US02 - TJ Birth before marriage of Individual"""
         path = 'proj03test.ged'
@@ -577,6 +609,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_birth_before_marriage(), '')
 
     """US03"""
+
     def test_validate_death_after_birth(self):
         """US03 - TJ Birth before Death of Individual"""
         path = 'proj03test.ged'
@@ -589,6 +622,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_death_after_birth(), '')
 
     """US04"""
+
     def test_validate_family_marriage_before_divorce(self):
         """US04	Marriage before divorce"""
         path = 'proj03test.ged'
@@ -601,6 +635,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_family_marriage_before_divorce(), '')
 
     """US05"""
+
     def test_validate_family_marriage_before_death(self):
         """US05	Marriage before death"""
         path = 'proj03test.ged'
@@ -613,6 +648,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_family_marriage_before_death(), '')
 
     """US06"""
+
     def test_validate_family_divorce_before_death(self):
         """US06	Divorce before death"""
         path = 'proj03test.ged'
@@ -625,6 +661,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_family_divorce_before_death(), '')
 
     """US07"""
+
     def test_validate_less_150_years_old(self):
         """US07	Less than 150 years old"""
         path = 'proj03test.ged'
@@ -637,6 +674,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_less_150_years_old(), '')
 
     """US08"""
+
     def test_validate_childbirth_after_marriage_parents(self):
         """US08 Birth after marriage of parents"""
         path = 'proj03test.ged'
@@ -649,6 +687,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_childbirth_after_marriage_parents(), '')
 
     """US09"""
+
     def test_validate_childbirth_before_death_parents(self):
         """US09 Birth before death of parents"""
         path = 'proj03test.ged'
@@ -683,6 +722,7 @@ class Test(unittest.TestCase):
         self.assertTrue(repo1.validate_childbirth_before_death_parents())
 
     """US10"""
+
     def test_validate_family_marriage_after_14(self):
         """US10 Marriage after 14"""
         path = 'proj03test.ged'
@@ -714,6 +754,7 @@ class Test(unittest.TestCase):
         self.assertTrue(repo1.validate_family_marriage_after_14())
 
     """US11"""
+
     def test_validate_no_bigamy(self):
         """US11 - Marriage should not occur during marriage to another spouse"""
         path = 'proj03test.ged'
@@ -726,6 +767,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_no_bigamy(), '')
 
     """US12"""
+
     def test_validate_parents_not_too_old(self):
         """US12 - Mother should be less than 60 years older than her children and father should be less than 80 years older than his children"""
         path = 'proj03test.ged'
@@ -738,6 +780,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_parents_not_too_old(), '')
 
     """US13"""
+
     def test_validate_sibling_spacing(self):
         """US13 - Birth Dates of Sibilings should be more than 8 months apart or less than 2 days apart"""
         path = 'proj03test.ged'
@@ -750,6 +793,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_sibiling_spacing(), '')
 
     """US14"""
+
     def test_validate_multiple_births(self):
         """US14 - Multiple births <= 5"""
         path = 'proj03test.ged'
@@ -762,8 +806,8 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_multiple_births(), '')
 
     """US15"""
-    def test_validate_maximum_number_of_siblings(self):
 
+    def test_validate_maximum_number_of_siblings(self):
         """US15 -Fewer than 15 siblings"""
         path = 'proj03test.ged'
         repo = Repository()
@@ -775,6 +819,7 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.validate_maximum_number_of_siblings(), '')
 
     """US16"""
+
     def test_validate_male_last_names(self):
         """US16 - All male members of a family should have the same last name"""
         path = 'proj03test.ged'
@@ -789,4 +834,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     main()
-    #unittest.main(exit=False, verbosity=2)
+    # unittest.main(exit=False, verbosity=2)
