@@ -490,13 +490,17 @@ class Repository:
                     for each_month_element in range(len(sibmonth)-1):
                         month_diff = sibmonth[each_month_element+1]-sibmonth[each_month_element]
                         if month_diff > 8:
-                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
                             result = True
+                        else:
+                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
+
                     for each_day_element in range(len(sibday)-1):
                         day_diff = sibday[each_day_element+1]-sibday[each_day_element]
                         if day_diff < 2:
-                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
                             result = True
+                        else:
+                            print("Error: FAMILY : US13: Family sibiling spacing should be more than 8 months apart or less than 2 days apart", key)
+
         return result
 
 
