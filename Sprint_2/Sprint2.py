@@ -446,11 +446,13 @@ class Repository:
             birthday_list = list()
             list_of_children = family.children
             for child in list_of_children:
-             birthday_list.append(self.individual[child].birthday)
+                birthday_list.append(self.individual[child].birthday)
             count_dict = dict((i, birthday_list.count(i)) for i in birthday_list)
             list_birthdays = count_dict.values()
-            if max(list_birthdays) <=5:
+            if max(list_birthdays) <= 5:
                 result = True
+            else:
+                print("Error: FAMILY : US14: " + key + "Number of children born in a single birth should not be greater than 5")
         return result
 
     def validate_maximum_number_of_siblings(self):
@@ -459,6 +461,8 @@ class Repository:
         for key, family in self.family.items():
             if len(family.children) < 15:
                 result = True
+            else:
+                print("Error: FAMILY : US15: " + key + "Total umber of children born in the family should be less than 15")
         return result
 
     def validate_no_bigamy(self):
