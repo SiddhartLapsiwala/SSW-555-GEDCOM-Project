@@ -1250,7 +1250,7 @@ class Test(unittest.TestCase):
         repo.read_file(path)
         self.assertEqual(repo.validate_unique_first_names_and_birthdays(), False)
         self.assertNotEqual(repo.validate_unique_first_names_and_birthdays(), True)
-        self.assertTrue(repo.validate_unique_first_names_and_birthdays())
+        self.assertFalse(repo.validate_unique_first_names_and_birthdays())
         self.assertIsNotNone(repo.validate_unique_first_names_and_birthdays())
         self.assertIsNot(repo.validate_unique_first_names_and_birthdays(), '')
 
@@ -1345,7 +1345,7 @@ class Test(unittest.TestCase):
         path = 'proj03test.ged'
         repo = Repository()
         repo.read_file(path)
-        self.assertEqual(len(repo.list_all_multiple_births()), 2)
+        self.assertEqual(len(repo.list_all_multiple_births()), 3)
         self.assertNotEqual(len(repo.list_all_multiple_births()), 10)
         self.assertTrue(len(repo.list_all_multiple_births()) > 0)
 
@@ -1354,6 +1354,6 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     main()
-    #unittest.main(verbosity=2)
+    unittest.main(verbosity=2)
     
 #
