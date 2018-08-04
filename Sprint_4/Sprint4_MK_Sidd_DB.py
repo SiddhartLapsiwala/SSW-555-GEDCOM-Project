@@ -11,11 +11,9 @@
  | Deficiencies:  None
  ===========================================================================
 """
-
 import unittest
 from prettytable import PrettyTable
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict, Counter
 
@@ -744,7 +742,7 @@ class Repository:
                 birthday = birthday.strftime('%m-%d')
                 if today_date < birthday < today_date_plus30:
                     list_result.append("Name: " + individual.name + " Birthday: " + individual.birthday)
-                    result = True;
+                    result = True
         print("List of upcoming birthday :")
         print('\n'.join(str(p) for p in list_result))
         return result
@@ -765,6 +763,40 @@ class Repository:
        print("List of upcoming Anniversaries :")
        print('\n'.join(str(p) for p in list_result))
        return result
+
+    def list_recent_births(self):
+        result = False
+        today = datetime.today()
+        date = today - timedelta(days=30)
+        list_result = list()
+        for indi in self.individual.values():
+            try:
+                bday = datetime.strptime(indi.birthday, '%Y-%m-%d')
+                if today >= bday >= date:
+                    result = True
+                    list_result.append("Individual ID: " + indi.id + " Name: " + indi.name + " Birthday: " + indi.birthday)
+            except ValueError:
+                pass
+        print("List of recent births:")
+        print('\n'.join(str(p) for p in list_result))
+        return result
+
+    def list_recent_deaths(self):
+        result = False
+        today = datetime.today()
+        date = today - timedelta(days=30)
+        list_result = list()
+        for indi in self.individual.values():
+            try:
+                death = datetime.strptime(indi.death, '%Y-%m-%d')
+                if today >= death >= date:
+                    result = True
+                    list_result.append("Individual ID: " + indi.id + " Name: " + indi.name + " Death: " + indi.death)
+            except ValueError:
+                pass
+        print("List of recent deaths:")
+        print('\n'.join(str(p) for p in list_result))
+        return result
 
 
 def main():
@@ -829,6 +861,10 @@ def main():
     """US30"""
     repo.validate_list_living_married()
     """US31"""
+    repo.list_recent_births()
+    """US35"""
+    repo.list_recent_deaths()
+    """US36"""
     repo.validate_list_living_single()
     """US38"""
     repo.list_upcoming_birthday()
@@ -1184,7 +1220,7 @@ class Test(unittest.TestCase):
         path = 'proj03test.ged'
         repo = Repository()
         repo.read_file(path)
-        self.assertEqual(len(repo.list_all_deceased()), 1)
+        self.assertEqual(len(repo.list_all_deceased()), 2)
         self.assertNotEqual(len(repo.list_all_deceased()), 10)
         self.assertTrue(len(repo.list_all_deceased()) > 0)
 
@@ -1209,6 +1245,30 @@ class Test(unittest.TestCase):
         self.assertTrue(repo.validate_list_living_single())
         self.assertIsNotNone(repo.validate_list_living_single())
         self.assertIsNot(repo.validate_list_living_single(), '')
+
+    """US35	List recent births"""
+
+    def test_list_recent_births(self):
+        path = 'proj03test.ged'
+        repo = Repository()
+        repo.read_file(path)
+        self.assertEqual(repo.list_recent_births(), True)
+        self.assertNotEqual(repo.list_recent_births(), False)
+        self.assertTrue(repo.list_recent_births())
+        self.assertIsNotNone(repo.list_recent_births())
+        self.assertIsNot(repo.list_recent_births(), '')
+
+    """"US36 List recent deaths """
+    def test_list_recent_deaths(self):
+        path = 'proj03test.ged'
+        repo = Repository()
+        repo.read_file(path)
+        self.assertEqual(repo.list_recent_deaths(), True)
+        self.assertNotEqual(repo.list_recent_deaths(), False)
+        self.assertTrue(repo.list_recent_deaths())
+        self.assertIsNotNone(repo.list_recent_deaths())
+        self.assertIsNot(repo.list_recent_deaths(), '')
+
 
     """US38"""
     def test_list_upcoming_birthday(self):
@@ -1235,6 +1295,9 @@ class Test(unittest.TestCase):
         self.assertIsNot(repo.list_upcoming_anniversaries(), '')
 
 
+
 if __name__ == '__main__':
     main()
-    # unittest.main(verbosity=2)
+    #unittest.main(verbosity=2)
+    
+#
